@@ -1,0 +1,17 @@
+# Assumes that conda, pip and build-essentials are installed
+---
+name: lorenz63
+channels:
+- conda-forge
+
+dependencies:
+- python=3.7
+- numpy
+- matplotlib
+- jupyter
+- pytest
+- scipy
+- pandas
+- pytables
+- nb_conda_kernels
+
