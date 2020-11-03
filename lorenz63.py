@@ -1,21 +1,27 @@
+# load python modules
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 
 
 class lorenz63:
-    dt            = 1e-3     # Differential interval
-    tmax          = 100   # Time step count
+    """ Lorenz 63 model """
 
-    def __init__(self, p=10.0, r=28.0, b=8.0/3.0):
+    def __init__(self, p=10.0, r=28.0, b=8.0/3.0, tmax=100, dt=1e-3):
+        # parameter for lorenz 63 system
         self.p = p
         self.r = r 
         self.b = b 
+        # parameter for numerical method
+        self.tmax = tmax
+        self.dt = dt
+        self.it = 0
 
 
-    def simulate(self, X0):
-        """ Loranz 63 model simulated in time """
-        X = X0
-        self.res = [[X0[0]],[X0[1]],[X0[2]]]
+    def simulate(self, X, dt=None):
+        """ Loranz 63 model simulated forward in time """
+        assert(len(X)==3), "wrong size of initial X"
+        
+        self.res = [[X[0]],[X[1]],[X[2]]]
         for _ in range( int(self.tmax/self.dt) ):
             k_0 = self.lorenz63f(X)
             k_1 = self.lorenz63f([ x + k * self.dt / 2 for x, k in zip(X, k_0) ])
@@ -35,20 +41,27 @@ class lorenz63:
                 ]
 
 
-    def plot(self):
+    def plot3D(self):
         """ Plotting """
         fig = plt.figure()
         ax = Axes3D(fig)
         ax.set_xlabel("x")
         ax.set_ylabel("y")
         ax.set_zlabel("z")
-        ax.set_title("Lorenz attractor (Runge-Kutta method)")
+        ax.set_title("Lorenz '63 (RK4)")
         ax.plot(self.res[0], self.res[1], self.res[2], color="red", lw=1)
         plt.show()
+        
+    def plot(self):
+        fig, axs = plt.subplots(3)
+        for i in range(3):
+            x = self.getTimeSeries(i)
+            axs[i].plot( range(len(x)), x )
     
     
     def getTimeSeries(self):
         return self.res
+    
     
     def getTimeSeries(self,i):
         return self.res[i]
