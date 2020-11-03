@@ -33,10 +33,10 @@ class lorenz63:
     
     
     def lorenz63f(self, X):
-        """ Lorenz equation """
+        """ RHS of Lorenz system (R3 -> R3 independent of t) """
         return [
-                -self.p * X[0] + self.p * X[1], 
-                -X[0] * X[2] + self.r * X[0] - X[1], 
+                self.p * ( X[1] - X[0]), 
+                X[0] * (self.r - X[2]) - X[1], 
                 X[0] * X[1] - self.b * X[2]
                 ]
 
