@@ -9,6 +9,7 @@ class ensemble:
     def __init__(self, model, Ne=10):
         self.Ne = Ne
         self.ensemble = [None]*self.Ne
+        self.model = model
         for i in range(self.Ne):
             self.ensemble[i] = copy.deepcopy(model)
         self.meant = None
@@ -17,8 +18,13 @@ class ensemble:
         """ Simulates an ensemble of models forward in time with perturbed initial conditions """
         eps = 1e0
         for model in self.ensemble:
-            X = np.random.uniform(1-eps,1+eps,3).tolist()
+            X = np.random.normal(1.0,1.0,3)
             model.simulate( X )
+        
+        
+    def getEnsemble(self):
+        """ Returns ensemble """
+        return self.ensemble
             
 
     def mean(self):
@@ -36,12 +42,12 @@ class ensemble:
         if self.meant is not None:
             for i in range(3):
                 x = self.meant[i,:]
-                axs[i].plot(range(len(x)),x, color="blue")
+                axs[i].plot(np.arange(len(x))*self.model.dt,x, color="blue")
         
         for model in self.ensemble:
             for i in range(3):
                 x = model.getTimeSeries(i)
-                axs[i].plot(range(len(x)),x, color="blue",alpha=0.1)
+                axs[i].plot(np.arange(len(x))*self.model.dt,x, color="blue",alpha=0.1)
         
         plt.show()
             

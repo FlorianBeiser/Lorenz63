@@ -1,4 +1,5 @@
 # load python modules
+import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 
@@ -16,29 +17,31 @@ class lorenz63:
         self.dt = dt
         self.it = 0
 
-
-    def simulate(self, X, dt=None):
+                
+    def simulate(self, X, T=None):
         """ Loranz 63 model simulated forward in time """
         assert(len(X)==3), "wrong size of initial X"
+        self.X_init = X
         
-        self.res = [[X[0]],[X[1]],[X[2]]]
-        for _ in range( int(self.tmax/self.dt) ):
-            k_0 = self.lorenz63f(X)
-            k_1 = self.lorenz63f([ x + k * self.dt / 2 for x, k in zip(X, k_0) ])
-            k_2 = self.lorenz63f([ x + k * self.dt / 2 for x, k in zip(X, k_1) ])
-            k_3 = self.lorenz63f([ x + k * self.dt for x, k in zip(X, k_2) ])
-            for i in range(3):
-                X[i] += (k_0[i] + 2 * k_1[i] + 2 * k_2[i] + k_3[i]) * self.dt / 6.0
-                self.res[i].append(X[i])
+        self.res = np.zeros( (3, int(self.tmax/self.dt)+1) )
+        self.res[:,0] = X
+        for i in range( int(self.tmax/self.dt) ):
+            k0 = self.lorenz63f(X)
+            k1 = self.lorenz63f( X + k0 * self.dt/2.0 )
+            k2 = self.lorenz63f( X + k1 * self.dt/2.0)
+            k3 = self.lorenz63f( X + k2 * self.dt )
+            
+            X += ( k0 + 2*k1 + 2*k2 + k3 ) * self.dt/6.0
+            self.res[:,i+1] = X
     
     
     def lorenz63f(self, X):
         """ RHS of Lorenz system (R3 -> R3 independent of t) """
-        return [
+        return np.array([
                 self.p * ( X[1] - X[0]), 
                 X[0] * (self.r - X[2]) - X[1], 
                 X[0] * X[1] - self.b * X[2]
-                ]
+                ])
 
 
     def plot3D(self):
@@ -49,19 +52,21 @@ class lorenz63:
         ax.set_ylabel("y")
         ax.set_zlabel("z")
         ax.set_title("Lorenz '63 (RK4)")
-        ax.plot(self.res[0], self.res[1], self.res[2], color="red", lw=1)
+        ax.plot(self.res[0,:], self.res[1,:], self.res[2,:], color="red", lw=1)
         plt.show()
-        
+    
+    
     def plot(self):
         fig, axs = plt.subplots(3)
         for i in range(3):
             x = self.getTimeSeries(i)
-            axs[i].plot( range(len(x)), x )
+            axs[i].plot( np.arange(len(x))*self.dt, x, color="red" )
+        plt.show()
     
     
-    def getTimeSeries(self):
+    def getLorenz63(self):
         return self.res
     
     
     def getTimeSeries(self,i):
-        return self.res[i]
+        return self.res[i,:]
