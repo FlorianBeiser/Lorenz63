@@ -13,26 +13,45 @@ class lorenz63:
         self.r = r 
         self.b = b 
         # parameter for numerical method
-        self.tmax = tmax
         self.dt = dt
+        self.tmax = tmax
+        # storing results
+        self.X0 = None
         self.it = 0
-
-                
-    def simulate(self, X, T=None):
-        """ Loranz 63 model simulated forward in time """
-        assert(len(X)==3), "wrong size of initial X"
-        self.X_init = X
-        
         self.res = np.zeros( (3, int(self.tmax/self.dt)+1) )
-        self.res[:,0] = X
-        for i in range( int(self.tmax/self.dt) ):
+        
+        
+    def clearSimulation(self):
+        self.X0 = None
+        self.it = 0
+        self.res = np.zeros( (3, int(self.tmax/self.dt)+1) )
+        
+        
+    def setInitial(self, X0):
+        assert(len(X0)==3), "wrong size of initial X"
+        self.X0 = X0
+        self.res[:,0] = self.X0
+        
+                
+    def simulate(self, T=None):
+        """ Loranz 63 model simulated forward in time """
+        X = self.res[:,self.it].tolist()
+            
+        if T is None: 
+            it_max = int(self.tmax/self.dt)
+        else:
+            it_max = int(T/self.dt)
+
+        while self.it < it_max :
             k0 = self.lorenz63f(X)
             k1 = self.lorenz63f( X + k0 * self.dt/2.0 )
             k2 = self.lorenz63f( X + k1 * self.dt/2.0)
             k3 = self.lorenz63f( X + k2 * self.dt )
             
             X += ( k0 + 2*k1 + 2*k2 + k3 ) * self.dt/6.0
-            self.res[:,i+1] = X
+            self.res[:,self.it+1] = X
+            
+            self.it += 1
     
     
     def lorenz63f(self, X):

@@ -13,11 +13,12 @@ class observation:
         self.num = int(self.tmax/self.dt)
         self.obs = np.zeros((3,self.num))
         
-        self.times = np.arange(self.dt, self.tmax+self.dt, self.dt)
+        self.times = np.arange(self.dt, self.tmax+self.dt, self.dt) # observation starts at t>0
         self.model_idx = np.zeros(self.num)
         
     def observe(self, model):
         """ observes model at observation times """
+        self.model = model
         np.random.seed(0)
         for i in range(self.num):
             self.model_idx[i] = int(self.times[i]/model.dt)
@@ -30,15 +31,16 @@ class observation:
     def plot(self, fig = None, axs = None):
         """ Plotting """
         if fig is None:
-            fig, axs = plt.subplots(3)
+            fig, axs = plt.subplots(3, sharex=True)
             show = True
         else:
             show = False
 
         for i in range(3):
             x = self.obs[i,:]
-            axs[i].plot( (np.arange(len(x))+1)*self.dt, x, "x", color="green" )
+            axs[i].plot( (np.arange(len(x))+1)*self.dt, x, "x", color="green" ) # observation does NOT start at t=0
         
         if show == True:
+            plt.setp(axs, xlim=(0,self.model.tmax))
             plt.show()
             

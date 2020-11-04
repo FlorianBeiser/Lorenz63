@@ -7,19 +7,25 @@ class ensemble:
     """ Ensemble of dynamical system models """ 
     
     def __init__(self, model, Ne=10):
+        self.model = model
+        # ensemble parameters
         self.Ne = Ne
         self.ensemble = [None]*self.Ne
-        self.model = model
-        for i in range(self.Ne):
-            self.ensemble[i] = copy.deepcopy(model)
         self.meant = None
-        
-    def simulate(self):
-        """ Simulates an ensemble of models forward in time with perturbed initial conditions """
+        # ensemble set 
         np.random.seed(10000)
+        for i in range(self.Ne):
+            self.ensemble[i] = copy.deepcopy( model )
+            self.ensemble[i].clearSimulation()
+            X0 = np.random.normal(1.0,1.0,3)
+            self.ensemble[i].setInitial( X0 )
+        
+    def simulate(self, T=None):
+        """ Simulates an ensemble of models forward in time with perturbed initial conditions """
         for model in self.ensemble:
-            X = np.random.normal(1.0,1.0,3)
-            model.simulate( X )
+            X0 = np.random.normal(1.0,1.0,3)
+            model.setInitial( X0 )
+            model.simulate( T ) 
         
         
     def getEnsemble(self):
