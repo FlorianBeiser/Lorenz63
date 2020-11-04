@@ -16,7 +16,7 @@ class ensemble:
         
     def simulate(self):
         """ Simulates an ensemble of models forward in time with perturbed initial conditions """
-        eps = 1e0
+        np.random.seed(10000)
         for model in self.ensemble:
             X = np.random.normal(1.0,1.0,3)
             model.simulate( X )
@@ -35,10 +35,15 @@ class ensemble:
         self.meant /= self.Ne
         
 
-    def plot(self):
+    def plot(self, fig=None, axs=None):
         """ Plotting """
         # Plotting mean
-        fig, axs = plt.subplots(3)
+        if fig is None:
+            fig, axs = plt.subplots(3)
+            show = True
+        else:
+            show = False
+
         if self.meant is not None:
             for i in range(3):
                 x = self.meant[i,:]
@@ -49,6 +54,7 @@ class ensemble:
                 x = model.getTimeSeries(i)
                 axs[i].plot(np.arange(len(x))*self.model.dt,x, color="blue",alpha=0.1)
         
-        plt.show()
+        if show == True:
+            plt.show()
             
     

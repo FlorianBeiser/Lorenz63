@@ -56,12 +56,19 @@ class lorenz63:
         plt.show()
     
     
-    def plot(self):
-        fig, axs = plt.subplots(3)
+    def plot(self, fig=None, axs=None):
+        if fig is None:
+            fig, axs = plt.subplots(3)
+            show = True
+        else:
+            show = False
+            
         for i in range(3):
             x = self.getTimeSeries(i)
             axs[i].plot( np.arange(len(x))*self.dt, x, color="red" )
-        plt.show()
+        
+        if show == True:
+            plt.show()
     
     
     def getLorenz63(self):
