@@ -22,15 +22,23 @@ class lorenz63:
         
         
     def clearSimulation(self):
-        self.X0 = None
+        """ Clearing results of previous simulations """
         self.it = 0
         self.res = np.zeros( (3, int(self.tmax/self.dt)+1) )
+        self.res[:,0] = self.X0        
         
         
-    def setInitial(self, X0):
+    def setInitialState(self, X0):
+        """ Setting initial states """
         assert(len(X0)==3), "wrong size of initial X"
         self.X0 = X0
         self.res[:,0] = self.X0
+        
+    
+    def setCurrentState(self, X):
+        """ Setting current state """
+        assert(len(X)==3), "wrong size of X"    
+        self.res[:,self.it] = X
         
                 
     def simulate(self, T=None):
@@ -64,7 +72,7 @@ class lorenz63:
 
 
     def plot3D(self):
-        """ Plotting """
+        """ Plotting in 3D """
         fig = plt.figure()
         ax = Axes3D(fig)
         ax.set_xlabel("x")
@@ -76,6 +84,7 @@ class lorenz63:
     
     
     def plot(self, fig=None, axs=None):
+        """ Plotting in 1D """
         if fig is None:
             fig, axs = plt.subplots(3)
             show = True
@@ -91,8 +100,20 @@ class lorenz63:
     
     
     def getLorenz63(self):
+        """ Returning results of Lorenz63 model """
         return self.res
     
     
     def getTimeSeries(self,i):
+        """ Returning result of Lorenz63 as time series of each variable """
         return self.res[i,:]
+    
+    
+    def getCurrentState(self):
+        """ Returning result of Lorenz63 at latest time step """ 
+        return self.res[:,self.it]
+    
+    
+    
+    
+    

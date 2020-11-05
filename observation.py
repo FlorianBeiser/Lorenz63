@@ -16,13 +16,18 @@ class observation:
         self.times = np.arange(self.dt, self.tmax+self.dt, self.dt) # observation starts at t>0
         self.model_idx = np.zeros(self.num)
         
+        self.noise_level = 1.0
+        self.R = self.noise_level * np.eye(3)
+        self.H = np.eye(3)
+        
+        
     def observe(self, model):
         """ observes model at observation times """
         self.model = model
         np.random.seed(0)
         for i in range(self.num):
             self.model_idx[i] = int(self.times[i]/model.dt)
-            self.obs[:,i] = model.res[:,int(self.model_idx[i])]  + np.random.normal(0,1,3)
+            self.obs[:,i] = model.res[:,int(self.model_idx[i])]  + np.random.normal(0,self.noise_level,3)
             
     def getObservation(self):
         """ Returns observations """

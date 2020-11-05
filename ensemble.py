@@ -11,34 +11,80 @@ class ensemble:
         # ensemble parameters
         self.Ne = Ne
         self.ensemble = [None]*self.Ne
-        self.meant = None
-        # ensemble set 
-        np.random.seed(10000)
+        # ensemble set with random perturbation in initial states
         for i in range(self.Ne):
             self.ensemble[i] = copy.deepcopy( model )
             self.ensemble[i].clearSimulation()
-            X0 = np.random.normal(1.0,1.0,3)
-            self.ensemble[i].setInitial( X0 )
+        self.setInitialStates()
+        # ensemble properties
+        self.meanT = None
+        self.meant = np.zeros_like(np.array(self.ensemble[0].res))
+            
+    
+    def setInitialStates(self, Cov=None):
+        """ Setting initial state for all ensemble members """
+        X0_model = self.model.X0
+        np.random.seed(10000)
+        for model in self.ensemble:
+            if Cov is None:
+                X0_member = X0_model + np.random.normal(0.0,1.0,3)
+            else:
+                X0_member = X0_model + np.random.multivariate_normal(np.zeros(3),Cov)
+            model.setInitialState( X0_member )
+    
+            
+    def setCurrentStates(self, mean, Cov=None):
+        """" Setting current state for all ensemble members """
+        for model in self.ensemble:
+            if Cov is None:
+                X = np.random.multivariate_normal( mean, Cov )
+            else:
+                X = np.random.multivariate_normal( mean, np.eye(3) )
+            model.setCurrentState( X )
+        
+
+    def clearSimulations(self):
+        """ Clears previous simulation results in the ensemble """
+        self.meant = None
+        self.meanT = None
+        for model in self.ensemble:
+            model.clearSimulation()
+
         
     def simulate(self, T=None):
         """ Simulates an ensemble of models forward in time with perturbed initial conditions """
         for model in self.ensemble:
-            X0 = np.random.normal(1.0,1.0,3)
-            model.setInitial( X0 )
             model.simulate( T ) 
         
         
     def getEnsemble(self):
         """ Returns ensemble """
         return self.ensemble
+    
+    
+    def currentMean(self):
+        """ Calculates mean of ensemble per timestep upto current time """
+        it_model = self.ensemble[0].it
+        print("it_model = ", it_model) 
+        self.meant = np.zeros(3)
+        print("res[:,+-1] = ", self.ensemble[0].res[:,it_model-1:it_model+1])
+        for model in self.ensemble:
+            self.meant += model.res[:,it_model]
+        self.meant /= self.Ne
+        
+
+    def getCurrentMean(self):
+        """ Returns mean of ensemble per timestep upto current time """
+        self.currentMean()
+        return self.meant
             
 
     def mean(self):
-        """ Calculats mean of ensemble per timestep """
-        self.meant = np.zeros_like(np.array(self.ensemble[0].res))
+        """ Calculates mean of ensemble per timestep for full time series """
+        self.meanT = np.zeros_like(np.array(self.ensemble[0].res))
         for model in self.ensemble:
-            self.meant += model.res
-        self.meant /= self.Ne
+            self.meanT += model.res
+        self.meanT /= self.Ne
         
 
     def plot(self, fig=None, axs=None):
@@ -50,9 +96,9 @@ class ensemble:
         else:
             show = False
 
-        if self.meant is not None:
+        if self.meanT is not None:
             for i in range(3):
-                x = self.meant[i,:]
+                x = self.meanT[i,:]
                 axs[i].plot(np.arange(len(x))*self.model.dt,x, color="blue")
         
         for model in self.ensemble:
