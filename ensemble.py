@@ -65,9 +65,7 @@ class ensemble:
     def currentMean(self):
         """ Calculates mean of ensemble per timestep upto current time """
         it_model = self.ensemble[0].it
-        print("it_model = ", it_model) 
         self.meant = np.zeros(3)
-        print("res[:,+-1] = ", self.ensemble[0].res[:,it_model-1:it_model+1])
         for model in self.ensemble:
             self.meant += model.res[:,it_model]
         self.meant /= self.Ne

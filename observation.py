@@ -21,13 +21,17 @@ class observation:
         self.H = np.eye(3)
         
         
+    def noise(self):
+        """ Returning realisation of observation error N(0,R) """
+        return np.random.normal(0,self.noise_level,3)
+        
     def observe(self, model):
         """ observes model at observation times """
         self.model = model
         np.random.seed(0)
         for i in range(self.num):
             self.model_idx[i] = int(self.times[i]/model.dt)
-            self.obs[:,i] = model.res[:,int(self.model_idx[i])]  + np.random.normal(0,self.noise_level,3)
+            self.obs[:,i] = model.res[:,int(self.model_idx[i])]  + self.noise()
             
     def getObservation(self):
         """ Returns observations """
