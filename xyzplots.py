@@ -21,6 +21,7 @@ class xyzplots:
         axs[2].set_xlabel("t")
         self.model.plot(fig, axs)
         self.observation.plot(fig, axs)
+        self.ensemble.mean()
         self.ensemble.plot(fig, axs)
         plt.show()
         

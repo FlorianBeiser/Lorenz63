@@ -18,6 +18,7 @@ class observation:
             self.dim += 1
         if zobs == True:
             self.dim += 1
+        assert(self.dim>0), "no observed variables"
         
         # Set up derived observation related arrays
         self.num = int(self.tmax/self.dt)
