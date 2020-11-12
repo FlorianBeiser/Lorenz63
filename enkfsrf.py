@@ -10,12 +10,13 @@ class enkfsrf:
         self.it_obs = it_obs
         
         
+            
     def assimilate(self):
         """ Assimilation of ensemble towards observation by EnKF in square root formulation """
         """ Notation following Vetra-Carvalho et al 2018 """
         
         Xfmean = self.ensemble.getCurrentMean()
-        Xfmean.shape = (3,1)
+        Xfmean.shape = (3,1) 
         
         Xf = np.zeros((3,self.ensemble.Ne))
         for i in range(self.ensemble.Ne):
@@ -24,14 +25,14 @@ class enkfsrf:
         Xfpert = Xf - Xfmean
                 
         H = self.observation.H        
-        HX = np.zeros((self.observation.Ny, self.ensemble.Ne))
+        HXf = np.zeros((self.observation.Ny, self.ensemble.Ne))
         for i in range(self.ensemble.Ne):
-            HX[:,i] = np.dot(H,Xf[:,i]) + self.observation.noise()
+            HXf[:,i] = np.dot(H,Xf[:,i]) 
             
-        HXmean = np.sum(HX,axis=1)/self.ensemble.Ne
-        HXmean.shape = (self.observation.Ny,1)
+        HXfmean = np.sum(HXf,axis=1)/self.ensemble.Ne
+        HXfmean.shape = (self.observation.Ny,1)
         
-        S = HX - HXmean
+        S = HXf - HXfmean 
         
         SS = 1/(self.ensemble.Ne-1) * np.dot(S,S.T)
 
@@ -42,8 +43,11 @@ class enkfsrf:
         y.shape = (self.observation.Ny,1)
         
         Y = np.dot(y,np.ones((1,self.ensemble.Ne)))
+        Ypert = np.zeros((self.observation.Ny,self.ensemble.Ne))
+        for i in range(self.ensemble.Ne):
+            Ypert[:,i] = self.observation.noise()
         
-        D = Y - HX 
+        D = Y - HXf + Ypert
         
         C = np.dot(Finv,D)
         
@@ -53,8 +57,6 @@ class enkfsrf:
         
         for i in range(self.ensemble.Ne):
             self.ensemble.ensemble[i].setCurrentState(Xa[:,i])
-            
-            
             
             
             

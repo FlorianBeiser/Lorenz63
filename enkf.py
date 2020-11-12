@@ -26,7 +26,7 @@ class enkf:
             d = y - np.dot(H, Xf) + self.observation.noise()
              
             Xa = Xf + np.dot(K, d)
-            model.setCurrentState(Xa)            
+            model.setCurrentState(Xa)
 
                    
     def covState(self):

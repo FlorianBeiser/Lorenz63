@@ -34,5 +34,5 @@ class filtering:
             elif self.method == "EnKFSRF":
                 assimilation = enkfsrf.enkfsrf(self.ensemble, self.observation, it_obs)
                 assimilation.assimilate()
-                 
+                
         self.ensemble.simulate() # simulate till tmax of model 
