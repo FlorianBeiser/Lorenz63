@@ -11,28 +11,28 @@ class observation:
         self.tmax = tmax
         
         # Determine dimension of observation
-        self.dim = 0 
+        self.Ny = 0 
         if xobs == True:
-            self.dim += 1
+            self.Ny += 1
         if yobs == True:
-            self.dim += 1
+            self.Ny += 1
         if zobs == True:
-            self.dim += 1
-        assert(self.dim>0), "no observed variables"
+            self.Ny += 1
+        assert(self.Ny>0), "no observed variables"
         
         # Set up derived observation related arrays
         self.num = int(self.tmax/self.dt)
-        self.obs = np.zeros((self.dim,self.num))
+        self.obs = np.zeros((self.Ny,self.num))
         
         self.times = np.arange(self.dt, self.tmax+self.dt, self.dt) # observation starts at t>0
         self.model_idx = np.zeros(self.num)
 
         # Construct observation matrix
-        self.H = np.zeros((self.dim,3))
+        self.H = np.zeros((self.Ny,3))
         x_already_observed = False
         y_already_observed = False
         z_already_observed = False
-        for i in range(self.dim):
+        for i in range(self.Ny):
             if xobs == True and x_already_observed == False:
                 self.H[i,0] = 1
                 x_already_observed = True
@@ -48,12 +48,12 @@ class observation:
         
         # Construct observation noise covariance matrix
         self.noise_level = 1.0
-        self.R = self.noise_level * np.eye(self.dim)
+        self.R = self.noise_level * np.eye(self.Ny)
 
         
     def noise(self):
         """ Returning realisation of observation error N(0,R) """
-        return np.random.normal(0,self.noise_level,self.dim)
+        return np.random.normal(0,self.noise_level,self.Ny)
         
     def observe(self, model):
         """ observes model at observation times """

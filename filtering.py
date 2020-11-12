@@ -2,10 +2,12 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import enkf
+import enkfsrf
 
 # for debugging
 import importlib
 importlib.reload( enkf ) 
+importlib.reload( enkfsrf )
 
 class filtering:
     """ Ensemble of dynamical system models """ 
@@ -24,9 +26,13 @@ class filtering:
             t_obs = self.observation.times[it_obs]
             self.ensemble.simulate( t_obs )
             
-            # Do EnKF
+            # Do data assimilation from list
             if self.method == "EnKF":
                 assimilation = enkf.enkf(self.ensemble, self.observation, it_obs)
                 assimilation.assimilate()
                 
-        self.ensemble.simulate()
+            elif self.method == "EnKFSRF":
+                assimilation = enkfsrf.enkfsrf(self.ensemble, self.observation, it_obs)
+                assimilation.assimilate()
+                 
+        self.ensemble.simulate() # simulate till tmax of model 
